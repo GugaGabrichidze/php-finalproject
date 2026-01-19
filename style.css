@@ -1,201 +1,288 @@
+/* =====================
+   1. გლობალური ცვლადები
+===================== */
+:root {
+  --bg-body: #0b0f1a;
+  --bg-card: #161b2a;
+  --bg-input: #1f293a;
+  --primary: #818cf8;
+  --accent: #2dd4bf;
+  --text-main: #e2e8f0;
+  --text-muted: #94a3b8;
+  --border: rgba(255, 255, 255, 0.08);
+  --radius: 16px;
+}
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 body {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  background-attachment: fixed;
-  padding: 20px;
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+/* =====================
+   2. INDEX & SHOP (მთავარი გვერდი)
+===================== */
+/* ეს სტილი მუშაობს მხოლოდ მაშინ, როცა body-ს არ აქვს სპეციალური კლასი */
+body:not(.admin-body-reset):not(.auth-page) {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 40px 20px;
 }
 
-
-.inputform {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-  width: 100%;
-  max-width: 400px;
-  margin: 40px auto;
-  transition: transform 0.3s ease;
-}
-
-.inputform:hover {
-  transform: translateY(-5px);
-}
-
-.inputform h2,
-.inputform h3 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 25px;
-  font-weight: 700;
-}
-
-.inputform input {
-  width: 100%;
-  padding: 14px 18px;
-  margin-bottom: 15px;
-  border: 2px solid #eee;
-  border-radius: 10px;
-  font-size: 16px;
-  transition: all 0.3s ease;
-  outline: none;
-}
-
-.inputform input:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 8px rgba(102, 126, 234, 0.2);
-}
-
-
-.btn,
-.inputform button {
-  width: 100%;
-  padding: 14px;
-  background: linear-gradient(to right, #667eea, #764ba2);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 10px;
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
-}
-
-.btn:hover,
-.inputform button:hover {
-  opacity: 0.9;
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-}
-
-.btn-delete {
-  background: #e74c3c;
-  padding: 8px 15px;
-  font-size: 14px;
-}
-
-
-.admin-wrapper {
+header {
   width: 100%;
   max-width: 1100px;
-  margin: 0 auto;
-}
-
-.admin-header {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  padding: 20px 30px;
-  border-radius: 15px;
-  color: white;
+  background: rgba(22, 27, 42, 0.8);
+  backdrop-filter: blur(15px);
+  padding: 18px 35px;
+  border-radius: 50px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 60px;
+  border: 1px solid var(--border);
 }
 
-.admin-header h1 {
-  font-size: 24px;
-}
-.admin-header a {
-  color: white;
+header a {
+  color: var(--text-main);
   text-decoration: none;
+  font-size: 14px;
   margin-left: 20px;
-  font-weight: 500;
-  transition: 0.3s;
 }
 
-
+/* პროდუქტების კონტეინერი - Grid განლაგება */
 .products-grid {
   display: grid;
+  /* ავტომატურად განსაზღვრავს სვეტების რაოდენობას ზომის მიხედვით */
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 25px;
+  gap: 30px;
   width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+/* ინდივიდუალური ბარათი */
+.product-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ეფექტი ბარათზე მაუსის მიტანისას */
+.product-card:hover {
+  transform: translateY(-8px); /* ოდნავ ზემოთ აიწევა */
+  border-color: var(--primary); /* ჩარჩო შეიფერება */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* პროდუქტის ფოტო */
+.product-card img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover; /* ფოტო არ გაიწელოს, შეივსოს ლამაზად */
+  border-bottom: 1px solid var(--border);
+}
+
+/* ინფორმაციის ბლოკი (ტექსტი და ღილაკი) */
+.product-info {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-grow: 1;
+}
+
+.product-info h3 {
+  font-size: 18px;
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+/* ფასის სტილი */
+.text-accent {
+  color: var(--accent);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* კალათაში დამატების ღილაკი */
+.product-info .btn {
+  text-align: center;
+  text-decoration: none;
+  margin-top: auto; /* ღილაკი ყოველთვის ბარათის ბოლოში იქნება */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
 }
 
 .product-card {
-  background: white;
-  border-radius: 15px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
   overflow: hidden;
-  transition: 0.3s;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  border: 1px solid var(--border);
 }
-
-.product-card:hover {
-  transform: translateY(-10px);
-}
-
 .product-card img {
   width: 100%;
-  height: 220px;
+  height: 250px;
   object-fit: cover;
 }
-
 .product-info {
   padding: 20px;
 }
-.price {
-  font-size: 1.4rem;
-  color: #667eea;
-  font-weight: bold;
-  margin: 10px 0;
+
+/* =====================
+   3. ADMIN PANEL (ადმინ პანელი)
+===================== */
+.admin-body-reset {
+  display: block !important;
+  overflow: hidden;
 }
 
-.table-container {
-  background: white;
-  padding: 25px;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
+.admin-page-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+.admin-sidebar {
+  width: 300px;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  padding: 30px 20px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.admin-content {
+  flex-grow: 1;
+  padding: 40px;
+  overflow-y: auto;
+  background: var(--bg-body);
+}
+
+/* =====================
+   4. LOGIN & REGISTER (ავტორიზაცია)
+===================== */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.inputform {
+  background: var(--bg-card);
+  padding: 40px;
+  border-radius: var(--radius);
   width: 100%;
-  overflow-x: auto;
+  max-width: 400px;
+  border: 1px solid var(--border);
 }
 
-table {
+/* =====================
+   5. საერთო ელემენტები (ცხრილები, ღილაკები, ინპუტები)
+===================== */
+.admin-card {
+  background: var(--bg-card);
+  padding: 25px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 30px;
+}
+
+.admin-table {
   width: 100%;
   border-collapse: collapse;
 }
-
-th {
-  background: #f8f9fa;
-  padding: 15px;
+.admin-table th {
   text-align: left;
-  color: #666;
-  border-bottom: 2px solid #eee;
+  color: var(--text-muted);
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.admin-table td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
 }
 
-td {
-  padding: 15px;
-  border-bottom: 1px solid #eee;
-}
-
-.thumb {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
   border-radius: 8px;
+  color: white;
 }
 
+.btn,
+button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
 
-.msg {
-  background: #d4edda;
-  color: #155724;
-  padding: 15px;
+.text-accent {
+  color: var(--accent);
+  font-weight: bold;
+}
+.mini-img {
+  width: 45px;
+  height: 45px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.admin-nav {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.admin-nav a {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
   border-radius: 10px;
-  margin-bottom: 20px;
-  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.admin-nav a:hover {
+  background: rgba(129, 140, 248, 0.1);
+  color: var(--primary);
+  transform: translateX(5px);
+}
+
+.admin-nav a[style*="color: #fb7185"]:hover {
+  background: rgba(251, 113, 133, 0.1);
+  color: #fb7185 !important;
 }

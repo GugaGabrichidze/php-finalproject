@@ -3,6 +3,7 @@ session_start();
 include_once 'dbhelper.php';
 $db = new Dbhelper();
 $products = $db->getAllProducts();
+$userData = isset($_SESSION['user_id']) ? $db->getUserById($_SESSION['user_id']) : null;
 
 if (isset($_GET['add_to_cart'])) {
     $pid = $_GET['add_to_cart'];
@@ -17,31 +18,38 @@ if (isset($_GET['add_to_cart'])) {
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="style.css">
-    <title>მაღაზია</title>
+    <title>🛍️ ონლაინ მაღაზია</title>
 </head>
 
 <body>
-    <div class="admin-wrapper">
-        <header class="admin-header">
-            <h1>🛍️ მაღაზია</h1>
-            <div>
-                <a href="cart.php">🛒 კალათა (<?php echo isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0; ?>)</a>
-                <a href="adminpanel.php">ადმინ პანელი</a>
-            </div>
-        </header>
-
-        <div class="products-grid">
-            <?php foreach ($products as $p): ?>
-                <div class="product-card">
-                    <img src="<?php echo $p['productimg']; ?>" alt="Product Image">
-                    <div class="product-info">
-                        <h3><?php echo $p['productname']; ?></h3>
-                        <p class="price"><?php echo $p['productprice']; ?> ₾</p>
-                        <a href="?add_to_cart=<?php echo $p['productid']; ?>" class="btn">კალათაში დამატება</a>
-                    </div>
-                </div>
-            <?php endforeach; ?>
+    <header>
+        <h1>🛍️ მაღაზია</h1>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <?php if ($userData): ?>
+                <img src="<?= !empty($userData['profile_img']) ? $userData['profile_img'] : 'IMG/profiles/default.png'; ?>"
+                    style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
+                <span style="font-weight: 600;"><?= htmlspecialchars($userData['name']); ?></span>
+                <a href="editprofile.php">⚙️ პროფილი</a>
+                <a href="adminpanel.php">🛠️ ადმინი</a>
+                <a href="logout.php" style="color: #fb7185;">🚪 გასვლა</a>
+            <?php else: ?>
+                <a href="login.php">🔑 შესვლა</a>
+            <?php endif; ?>
+            <a href="cart.php">🛒 კალათა (<?= isset($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0; ?>)</a>
         </div>
+    </header>
+
+    <div class="products-grid">
+        <?php foreach ($products as $p): ?>
+            <div class="product-card">
+                <img src="<?= $p['productimg']; ?>">
+                <div class="product-info">
+                    <h3><?= $p['productname']; ?></h3>
+                    <p class="text-accent"><?= $p['productprice']; ?> ₾</p>
+                    <a href="?add_to_cart=<?= $p['productid']; ?>" class="btn" style="margin-top: 15px; text-decoration: none;">🛒 კალათაში</a>
+                </div>
+            </div>
+        <?php endforeach; ?>
     </div>
 </body>
 

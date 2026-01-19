@@ -31,12 +31,23 @@ class Dbhelper
         return $stmt->execute();
     }
 
-    public function updateUser($id, $name, $lastname, $password)
+
+    public function updateUser($id, $name, $lastname, $password, $imgpath)
     {
         $hashed = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $this->conn->prepare("UPDATE user SET name = ?, lastname = ?, password = ? WHERE UserID = ?");
-        $stmt->bind_param("sssi", $name, $lastname, $hashed, $id);
+        $stmt = $this->conn->prepare("UPDATE user SET name = ?, lastname = ?, password = ?, profile_img = ? WHERE UserID = ?");
+        $stmt->bind_param("ssssi", $name, $lastname, $hashed, $imgpath, $id);
         return $stmt->execute();
+    }
+
+
+    // დაამატეთ ეს ფუნქცია Dbhelper კლასში
+    public function getUserById($id)
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM user WHERE UserID = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
     }
     public function updateProduct($id, $name, $price, $imgPath = null)
     {

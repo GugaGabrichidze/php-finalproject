@@ -1,7 +1,6 @@
 <?php
 session_start();
 include_once 'dbhelper.php';
-
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
@@ -10,136 +9,136 @@ if (!isset($_SESSION['user_id'])) {
 $db = new Dbhelper();
 $message = "";
 
-
+// პროდუქტის დამატება
 if (isset($_POST['add'])) {
     $target_dir = "IMG/";
-
-    if (!file_exists($target_dir)) {
-        mkdir($target_dir, 0777, true);
-    }
-
+    if (!file_exists($target_dir)) mkdir($target_dir, 0777, true);
     $file_name = time() . "_" . basename($_FILES["productimg"]["name"]);
     $target_file = $target_dir . $file_name;
-
     if (move_uploaded_file($_FILES["productimg"]["tmp_name"], $target_file)) {
-        if ($db->addProduct($_POST['productname'], $_POST['productprice'], $target_file)) {
-            $message = "პროდუქტი წარმატებით დაემატა!";
-        } else {
-            $message = "ბაზაში ჩაწერის შეცდომა!";
-        }
-    } else {
-        $message = "ფაილის საქაღალდეში გადატანა ვერ მოხერხდა!";
+        if ($db->addProduct($_POST['productname'], $_POST['productprice'], $target_file)) $message = "წარმატებით დაემატა!";
     }
 }
 
+// პროდუქტის წაშლა
 if (isset($_GET['delete'])) {
     $db->deleteProduct($_GET['delete']);
     header("Location: adminpanel.php");
     exit();
 }
 
-
+// შეკვეთის წაშლა (ეს ნაწილი გჭირდებოდათ)
 if (isset($_GET['delete_order'])) {
-    if ($db->deleteOrder($_GET['delete_order'])) {
-        header("Location: adminpanel.php");
-        exit();
-    }
+    $db->deleteOrder($_GET['delete_order']);
+    header("Location: adminpanel.php");
+    exit();
 }
 
 $products = $db->getAllProducts();
 $orders = $db->getAllOrders();
 ?>
-
 <!DOCTYPE html>
 <html lang="ka">
 
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="style.css">
-    <title>ადმინ პანელი</title>
+    <title>Admin Panel</title>
 </head>
 
-<body>
-    <div class="admin-wrapper">
-        <header class="admin-header">
-            <h1>ადმინ პანელი</h1>
-            <div>
-                <a href="editprofile.php">პროფილი</a>
-                <a href="index.php">მაღაზია</a>
-                <a href="logout.php" style="color:#ffcccc;">გამოსვლა</a>
+<body class="admin-body-reset">
+    <div class="admin-page-container">
+        <aside class="admin-sidebar">
+            <div class="sidebar-box">
+                <h2>Dashboard</h2>
+                <form method="post" enctype="multipart/form-data" class="sidebar-add-form" style="margin-top: 20px;">
+                    <h4 style="margin-bottom: 15px;">➕ პროდუქტის დამატება</h4>
+                    <input type="text" name="productname" placeholder="სახელი" required>
+                    <input type="number" step="0.01" name="productprice" placeholder="ფასი" required>
+                    <input type="file" name="productimg" id="file" hidden required>
+                    <label for="file" class="file-label-btn" style="margin-bottom: 10px;">📷 აირჩიეთ ფოტო</label>
+                    <button type="submit" name="add">შენახვა</button>
+                    <?php if ($message) echo "<p style='color: var(--accent); text-align: center; margin-top: 10px;'>$message</p>"; ?>
+                </form>
+
+                <nav class="admin-nav">
+                    <a href="index.php">🏠 მაღაზია</a>
+                    <a href="editprofile.php">⚙️ პროფილი</a>
+                    <a href="logout.php" style="color: #fb7185;">🚪 გასვლა</a>
+                </nav>
             </div>
-        </header>
+        </aside>
 
-        <div class="inputform">
-            <h3>პროდუქტის დამატება</h3>
-            <?php if ($message): ?>
-                <p class="msg" style="color: green; text-align: center;"><?php echo $message; ?></p>
-            <?php endif; ?>
-            <form method="post" enctype="multipart/form-data">
-                <input type="text" name="productname" placeholder="სახელი" required>
-                <input type="number" step="0.01" name="productprice" placeholder="ფასი" required>
-                <input type="file" name="productimg" required>
-                <button type="submit" name="add" class="btn">დამატება</button>
-            </form>
-        </div>
-
-        <div class="table-container">
-            <h3>პროდუქტების სია</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ფოტო</th>
-                        <th>სახელი</th>
-                        <th>ფასი</th>
-                        <th>მოქმედება</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($products as $p): ?>
+        <main class="admin-content">
+            <div class="admin-card">
+                <h3>📦 პროდუქცია</h3>
+                <table class="admin-table">
+                    <thead>
                         <tr>
-                            <td><img src="<?php echo $p['productimg']; ?>" class="thumb" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;"></td>
-                            <td><?php echo $p['productname']; ?></td>
-                            <td><?php echo $p['productprice']; ?> ₾</td>
-                            <td>
-                                <a href="editproduct.php?id=<?php echo $p['productid']; ?>" class="btn" style="padding: 5px 10px; background: orange; text-decoration: none; color: white; border-radius: 4px;">რედაქტირება</a>
-                                <a href="?delete=<?php echo $p['productid']; ?>" class="btn btn-delete" onclick="return confirm('ნამდვილად გსურთ წაშლა?')" style="padding: 5px 10px; background: red; text-decoration: none; color: white; border-radius: 4px;">წაშლა</a>
-                            </td>
+                            <th>ფოტო</th>
+                            <th>სახელი</th>
+                            <th>ფასი</th>
+                            <th>მართვა</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($products as $p): ?>
+                            <tr>
+                                <td><img src="<?= $p['productimg']; ?>" class="mini-img"></td>
+                                <td><?= htmlspecialchars($p['productname']); ?></td>
+                                <td class="text-accent"><?= $p['productprice']; ?> ₾</td>
+                                <td>
+                                    <a href="editproduct.php?id=<?= $p['productid']; ?>" style="text-decoration: none;">✏️</a>
+                                    <a href="?delete=<?= $p['productid']; ?>" style="text-decoration: none; margin-left: 10px;" onclick="return confirm('წავშალოთ?')">🗑️</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
 
-        <div class="table-container" style="margin-top:30px;">
-            <h3>შემოსული შეკვეთები</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>კლიენტი</th>
-                        <th>დეტალები</th>
-                        <th>ჯამი</th>
-                        <th>თარიღი</th>
-                        <th>მოქმედება</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($orders as $o): ?>
+            <div class="admin-card">
+                <h3>🛒 შეკვეთები</h3>
+                <table class="admin-table">
+                    <thead>
                         <tr>
-                            <td><?php echo $o['user_name']; ?></td>
-                            <td><?php echo $o['product_details']; ?></td>
-                            <td><?php echo $o['total_price']; ?> ₾</td>
-                            <td><?php echo $o['order_date']; ?></td>
-                            <td>
-                                <a href="?delete_order=<?php echo $o['order_id']; ?>"
-                                    class="btn btn-delete"
-                                    onclick="return confirm('დარწმუნებული ხართ, რომ გსურთ შეკვეთის წაშლა?')"
-                                    style="padding: 5px 10px; background: red; text-decoration: none; color: white; border-radius: 4px;">წაშლა</a>
-                            </td>
+                            <th>კლიენტი</th>
+                            <th>დეტალები</th>
+                            <th>ჯამი</th>
+                            <th>თარიღი</th>
+                            <th>მართვა</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($orders)): ?>
+                            <?php foreach ($orders as $o): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($o['user_name'] ?? 'სტუმარი'); ?></td>
+
+                                    <td style="font-size: 13px; color: var(--text-muted);">
+                                        <?= htmlspecialchars($o['product_details'] ?? 'ინფორმაცია არაა'); ?>
+                                    </td>
+
+                                    <td class="text-accent"><?= $o['total_price']; ?> ₾</td>
+
+                                    <td><?= isset($o['order_date']) ? date('d.m.Y', strtotime($o['order_date'])) : date('d.m.Y'); ?></td>
+
+                                    <td>
+                                        <a href="?delete_order=<?= $o['order_id']; ?>"
+                                            onclick="return confirm('ნამდვილად გსურთ შეკვეთის წაშლა?')"
+                                            style="text-decoration: none;">❌</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="5" style="text-align:center; padding: 20px;">შეკვეთები არ მოიძებნა</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </main>
     </div>
 </body>
 
