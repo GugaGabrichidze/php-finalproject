@@ -41,7 +41,7 @@ class Dbhelper
     }
 
 
-    // დაამატეთ ეს ფუნქცია Dbhelper კლასში
+    
     public function getUserById($id)
     {
         $stmt = $this->conn->prepare("SELECT * FROM user WHERE UserID = ?");
